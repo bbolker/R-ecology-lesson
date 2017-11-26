@@ -50,8 +50,8 @@ already have installed the **`tidyverse`** package. This is an
 "umbrella-package" that installs several packages useful for data analysis which
 work together well such as **`tidyr`**, **`dplyr`**, **`ggplot2`**, **`tibble`**, etc.
 
-**`tidyverse`** package tries to address 3 major problems with some of base R functions:
-1. The results from a base R function sometimes depends on the type of data.
+The **`tidyverse`** package tries to address 3 major problems with some of base R functions:
+1. The results from a base R function sometimes depend on the type of data.
 2. Using R expressions in a non standard way, which can be confusing for new learners.
 3. Hidden arguments, having default operations that new learners are not aware of.
 
@@ -435,14 +435,37 @@ surveys %>%
 
 In the 
 <span style="background:yellow">[spreadsheet lesson](http://www.datacarpentry.org/spreadsheet-ecology-lesson/01-format-data/)</span> we discussed how to 
-structure our data leading to the four rules defining a tidy dataset:
+structure our data:
 
 1. Each variable has its own column
 2. Each observation has its own row
 3. Each value must have its own cell
-4. Each type of observational unit forms a table
 
-Here we examine the fourth rule: Each type of observational unit forms a table.
+Rule #2 is a little trickier than it seems, however: what counts as an "observation"? Is it an individual, or the individual measurements taken on an individual (weight, hindfoot length, etc.), or all the individuals caught in a given plot on a given day? A table where (for example) all the individuals caught in a given plot count as a single observation is called **wide** (it has many columns and few rows), while one where each individual has its own observation is called **long** (it has many rows and few columns).
+
+Many researchers store data in wide format by default, because it's often easier for data entry and for human readability. However, most statistical tools (including R, and especially tidyverse) work better with long format. The `gather()` function from the tidyverse converts data from wide to long format: the `spread()` function converts from long to wide (which, as we will see, can be useful for generating human-readable summaries).
+
+Suppose we are given a data table with species counts per plot and day, like this:
+```{r widetab,results="asis"} 
+library(pander)
+
+## select and summarize: number by species/plot
+svy_w1 <- surveys %>% select(month,day,year,plot_id,species_id) %>%
+    group_by(month,day,year,plot_id,species_id) %>%
+    summarize(species_count=n())
+
+## reorder species 
+svy_w2 <- svy_w1 %>% ungroup %>%
+    mutate(species_id=reorder(factor(species_id),species_count,
+                              FUN=function(x) -mean(x))) %>%
+    spread(species_id,species_count,fill=0)
+
+svy_w2 %>%     select(month:RM) %>%
+    mutate(`...`="...") %>% 
+    head %>%   pander
+```
+
+In order to work with this data set effectively in R, we need to convert it to long format. We want to convert all of the columns corresponding to species abbreviations into a single pair of columns, one (the **key**) containing the species abbreviation and the other (the **value**) containing the number of that species counted in the corresponding 
 
 In `surveys` , the rows of `surveys` contain the values of variables associated
 with each record (the unit), values such the weight or sex of each animal 
