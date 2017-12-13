@@ -1,6 +1,9 @@
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e68a7644ebeb29fbc902a14129b4c232ef67d625
 ### Creating objects in R
 ### Challenge
 ##
@@ -42,7 +45,11 @@
 ## 1. Using this vector of length measurements, create a new vector with the NAs
 ## removed.
 ##
+<<<<<<< HEAD
 ##    lengths <- c(10,24,NA,18,NA,20)
+=======
+##    lengths <- c(10, 24, NA, 18, NA, 20)
+>>>>>>> e68a7644ebeb29fbc902a14129b4c232ef67d625
 ##
 ## 2. Use the function `median()` to calculate the median of the `lengths` vector.
 
@@ -96,9 +103,15 @@ plot(surveys$sex)
 ## ## Challenge:
 ## ##  There are a few mistakes in this hand-crafted `data.frame`,
 ## ##  can you spot and fix them? Don't hesitate to experiment!
+<<<<<<< HEAD
 ## animal_data <- data.frame(animal=c(dog, cat, sea cucumber, sea urchin),
 ##                           feel=c("furry", "squishy", "spiny"),
 ##                           weight=c(45, 8 1.1, 0.8))
+=======
+## animal_data <- data.frame(animal = c(dog, cat, sea cucumber, sea urchin),
+##                           feel = c("furry", "squishy", "spiny"),
+##                           weight = c(45, 8 1.1, 0.8))
+>>>>>>> e68a7644ebeb29fbc902a14129b4c232ef67d625
 ## ## Challenge:
 ## ##   Can you predict the class for each of the columns in the following
 ## ##   example?
@@ -108,11 +121,19 @@ plot(surveys$sex)
 ## ##     to this call?
 ## ##   * What would you need to change to ensure that each column had the
 ## ##     accurate data type?
+<<<<<<< HEAD
 ## country_climate <- data.frame(country=c("Canada", "Panama", "South Africa", "Australia"),
 ##                                climate=c("cold", "hot", "temperate", "hot/temperate"),
 ##                                temperature=c(10, 30, 18, "15"),
 ##                                northern_hemisphere=c(TRUE, TRUE, FALSE, "FALSE"),
 ##                                has_kangaroo=c(FALSE, FALSE, FALSE, 1))
+=======
+## country_climate <- data.frame(country = c("Canada", "Panama", "South Africa", "Australia"),
+##                                climate = c("cold", "hot", "temperate", "hot/temperate"),
+##                                temperature = c(10, 30, 18, "15"),
+##                                northern_hemisphere = c(TRUE, TRUE, FALSE, "FALSE"),
+##                                has_kangaroo = c(FALSE, FALSE, FALSE, 1))
+>>>>>>> e68a7644ebeb29fbc902a14129b4c232ef67d625
 
 
 ### Manipulating and analyzing data with dplyr
@@ -293,9 +314,15 @@ genus_counts <- left_join(surveys, plots) %>%
   group_by(plot_type, genus) %>%
   tally %>%
   collect()
+<<<<<<< HEAD
 species <- read.csv("data/species.csv")
 surveys <- read.csv("data/surveys.csv")
 plots <- read.csv("data/plots.csv")
+=======
+species <- read_csv("data/species.csv")
+surveys <- read_csv("data/surveys.csv")
+plots <- read_csv("data/plots.csv")
+>>>>>>> e68a7644ebeb29fbc902a14129b4c232ef67d625
 my_db_file <- "portal-database.sqlite"
 my_db <- src_sqlite(my_db_file, create = TRUE)
 my_db
