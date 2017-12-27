@@ -228,12 +228,8 @@ functions, too, as long as the **`dplyr`** or `magrittr` package is loaded).
 ```{r, purl = FALSE}
 surveys %>%
   mutate(weight_kg = weight / 1000) %>%
-  head
+  head()
 ```
-
-Note that we don't include parentheses at the end of our call to `head()` above.
-When piping into a function with no additional arguments, you can call the
-function with or without parentheses (e.g. `head` or `head()`).
 
 The first few rows of the output are full of `NA`s, so if we wanted to remove
 those we could insert a `filter()` in the chain:
@@ -242,7 +238,7 @@ those we could insert a `filter()` in the chain:
 surveys %>%
   filter(!is.na(weight)) %>%
   mutate(weight_kg = weight / 1000) %>%
-  head
+  head()
 ```
 
 `is.na()` is a function that determines whether something is an `NA`. The `!`
@@ -451,7 +447,7 @@ Many researchers store data in the former (wider) format by default, because it'
 
 Suppose we are given a data table with species counts per plot and date for 
 observations taken in 1977, like this:
-```{r widetab,results="asis"} 
+```{r widetab,results="asis",echo=FALSE} 
 library(pander)
 
 ## select and summarize: number by species/plot
@@ -461,7 +457,8 @@ svy_w1 <- surveys %>% select(month,day,year,plot_id,species_id) %>%
     rename(species_count=n)
 
 ## reorder species 
-surveys_wide <- svy_w1 %>% ungroup %>% filter(year==1977) %>%
+surveys_wide <- svy_w1 %>% 
+  ungroup() %>% filter(year==1977) %>%
     mutate(species_id=reorder(factor(species_id),species_count,
                               FUN=function(x) -mean(x))) %>%
     spread(species_id,species_count,fill=0)
@@ -469,15 +466,26 @@ surveys_wide <- svy_w1 %>% ungroup %>% filter(year==1977) %>%
 ## just the first few columns
 surveys_wide %>%     select(1:8) %>%
     mutate(`...`="...") %>% 
-    head %>%   pander
+    head() %>%   pander()
 
 ## would be nicer to have an example like
 ##  date plot  temperature pH
 ```
+where each of the column names after `plot_id`
+represents a species abbreviation.
 
-You can download this file from **here** and read it in with `read.csv("surveys_wide.csv")`.
+You can get this file by retrieving it from the course web page:
+```{r download_wide,eval=FALSE}
+download.file("tinyurl.com/dcmac2017dec/data/surveys_wide.csv",dest="surveys_wide.csv")
+```
 
-In order to work with this data set effectively in R, we need to convert it to long format. We want to convert all of the columns corresponding to species abbreviations into a single pair of columns, one (the **key**) containing the species abbreviation and the other (the **value**) containing the number of that species counted on a given date in a given location. The key point here is that we that the data structure is tidy, but
+Save it in your working directory and read it in with 
+
+```{r read_wide_surveys}
+surveys_wide <- read.csv("surveys_wide.csv")
+```
+
+In order to work with this data set effectively in R, we need to convert it to long format. We want to convert all of the columns corresponding to species abbreviations into a single pair of columns, one (the **key**) containing the species abbreviation and the other (the **value**) containing the number of that species counted on a given date in a given location. The key point here is that the data structure is tidy, but
 but we are **reshaping** the data according to the observations of interest:
 numbers of a particular species observed in a plot rather than the 
 numbers of all species observed in that plot.
@@ -485,7 +493,7 @@ numbers of all species observed in that plot.
 Here's an illustration of how `gather()` works to convert a (relatively) wide data
 set to a longer format:
 
-![](fig/14-tidyr-fig4.png)
+![](fig/14-tidyr-fig3.png)
 
 The opposite transformation would transform a single pair of columns (`species_id` and `count`) with many rows into many columns (one for each species) with fewer rows (only one per plot/date). We can do both these of transformations with two `tidyr` functions, `spread()`
 and `gather()`.
@@ -531,7 +539,7 @@ row, you don't even need to list them all - just use the `:` operator!
 
 ```{r, purl=FALSE}
 surveys_long <- surveys_wide %>%
-  gather(key = genus, value = mean_weight, -(month:plot_id))
+  gather(key = species_abbrev, value = count, -(month:plot_id))
 
 ## equivalently:
 ## specify columns to include (here columns are specified by number:
@@ -611,7 +619,7 @@ surveys_gw %>%
 
 > ### Challenge {.challenge}
 >
-> 1. Spread the data frame with `year` as columns, `plot_id` as rows, and the
+> 1. Spread the `surveys` data frame with `year` as columns, `plot_id` as rows, and the
 >   number of genera per plot as the values. You will need to summarize before
 >   reshaping, and use the function `n_distinct()` to get the number of unique
 >   types of a genera. It's a powerful function! See `?n_distinct` for more.
@@ -620,7 +628,7 @@ surveys_gw %>%
 >    `plot_id` by `year` combination.
 >
 > 3. The `surveys` data set has
->    two columns of measurement: `hindfoot_length` and `weight`.  This makes it
+>    two measurement columns: `hindfoot_length` and `weight`.  This makes it
 >    difficult to do things like look at the relationship between mean values of
 >    each measurement per year in different plot types. Let's walk through a
 >    common solution for this type of problem. First, use `gather()` to create a
@@ -637,7 +645,7 @@ surveys_gw %>%
 ```{r, eval=FALSE, purl=TRUE, echo=FALSE}
 ## Reshaping challenges
 
-## 1. Make a wide data frame with `year` as columns, `plot_id`` as rows, and the values are the number of genera per plot. You will need to summarize before reshaping, and use the function `n_distinct` to get the number of unique types of a genera. It's a powerful function! See `?n_distinct` for more.
+## 1. Make a wide data frame with `year` as columns, `plot_id`` as rows, and where the values are the number of genera per plot. You will need to summarize before reshaping, and use the function `n_distinct` to get the number of unique types of a genera. It's a powerful function! See `?n_distinct` for more.
 
 ## 2. Now take that data frame, and make it long again, so each row is a unique `plot_id` `year` combination
 
@@ -679,8 +687,7 @@ Now that you have learned how to use **`dplyr`** to extract information from
 or summarize your raw data, you may want to export these new data sets to share
 them with your collaborators or for archival.
 
-Similar to the `read_csv()` function used for reading CSV files into R, there is
-a `write_csv()` function that generates CSV files from data frames.
+Similar to the `read_csv()` function used for reading CSV files into R, the tidyverse includes a `write_csv()` function that generates CSV files from data frames.
 
 Before using `write_csv()`, we are going to create a new folder, `data_output`,
 in our working directory that will store this generated data set. We don't want
@@ -720,7 +727,7 @@ observations for these more common species:
 ## Extract the most common species_id
 species_counts <- surveys_complete %>%
   group_by(species_id) %>%
-  tally %>%
+  tally() %>%
   filter(n >= 50)
 
 ## Only keep the most common species
@@ -742,7 +749,7 @@ surveys_complete <- surveys %>%
 ##  appear at least 50 times in our dataset:
 species_counts <- surveys_complete %>%
     group_by(species_id) %>%
-    tally %>%
+    tally() %>%
     filter(n >= 50) %>%
     select(species_id)
 
